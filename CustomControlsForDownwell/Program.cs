@@ -142,7 +142,7 @@ RevertCaption = false"; // please do not modify.
             Console.WriteLine("Ok, we're done here, launch the game and press any key to exit.");
             Console.ReadKey(true);
             Console.WriteLine("Cleaning up...");
-            Directory.Delete(Path.GetDirectoryName(datawinpath), true);
+            if (singleexe) Directory.Delete(Path.GetDirectoryName(datawinpath), true);
         }
 
         static bool CopyIXPFolder()
