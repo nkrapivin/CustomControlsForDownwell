@@ -1,0 +1,1 @@
+return ds_map_find_value(global.keyboard_name_to_key, string_lower(argument0));
