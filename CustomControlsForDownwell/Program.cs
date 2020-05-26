@@ -12,11 +12,13 @@ namespace CustomControlsForDownwell
     {
         const string DefaultIni =
 @"[Keyboard]
-README_PLEASE = OPEN https://yal.cc/key-code-to-key-name-and-vice-versa/ FOR KEYCODE NAMES.
+README_PLEASE = OPEN https://yal.cc/key-code-to-key-name-and-vice-versa/ FOR KEYCODE NAMES. Choose IS SHOOT. Cancel IS PAUSE.
 Left = a
 Right = d
 Choose = shift
 Cancel = escape
+README_MOUSE = YOU CAN SET Left,Right,Choose,Cancel TO MOUSE BUTTONS TOO.
+README_MOUSE_TWO = mb_left IS LEFT MOUSE BUTTON, mb_right IS RIGHT MOUSE BUTTON, mb_middle IS MIDDLE MOUSE BUTTON (wheel click).
 
 [Gamepad]
 README_PLEASE = OPEN https://docs2.yoyogames.com/source/_build/3_scripting/4_gml_reference/controls/gamepad%20input/index.html FOR gp_ CONSTANTS.
@@ -27,7 +29,7 @@ Down = gp_padd
 Choose = gp_face1
 Cancel = gp_face2
 Deadzone = 0.65
-README_SLOT = Xbox 360 pads have slot id from 0 to 3. DualShock 4 pads have slot id from 4 to 11
+README_SLOT = Xbox 360 pads have slot id from 0 to 3. DualShock 4 pads have slot id from 4 to 11.
 README_SLOT_TWO = To enable automatic gamepad detection (Async System Event) set Slot to -1, set it to anything lower than -1 to disable gamepad input.
 Slot = 0
 
@@ -37,9 +39,9 @@ RevertCaption = false"; // please do not modify.
 
         static UndertaleData Data;
 
-        static string mypath = AppDomain.CurrentDomain.BaseDirectory + "Scripts" + Path.DirectorySeparatorChar;
+        static readonly string mypath = AppDomain.CurrentDomain.BaseDirectory + "Scripts" + Path.DirectorySeparatorChar;
 
-        static void Main(string[] args)
+        private static void Main()
         {
             Console.WriteLine("Main() called!");
             Console.WriteLine();
@@ -150,6 +152,14 @@ RevertCaption = false"; // please do not modify.
             string tempPathToIXP = Environment.GetEnvironmentVariable("TEMP") + Path.DirectorySeparatorChar + "IXP000.TMP" + Path.DirectorySeparatorChar;
             string newPath = Environment.GetEnvironmentVariable("TEMP") + Path.DirectorySeparatorChar + "ForPatchTemp" + Path.DirectorySeparatorChar;
             if (!Directory.Exists(tempPathToIXP)) return false;
+            if (Directory.Exists(newPath))
+            {
+                try
+                {
+                    Directory.Delete(newPath);
+                }
+                catch { }
+            }
 
             bool failed = false;
             try
@@ -180,7 +190,10 @@ RevertCaption = false"; // please do not modify.
         // Basically a copied-over .csx file...
         static void PatchThing()
         {
-            Data.GeneralInfo.DisplayName.Content = "Downwell [Custom Controls Mod]";
+            if (Data.GeneralInfo.DisplayName.Content == "Downwell [Custom Controls Mod]")
+                ScriptError("The mod is already applied! Please reinstall Downwell.", "SCRIPTMSG|ERR");
+            else
+                Data.GeneralInfo.DisplayName.Content = "Downwell [Custom Controls Mod]";
 
             // Keyname->Keycode stuff... (thx yal)
             AddScriptFromFile(mypath + "scrYALKeycodderInit.gml");
@@ -227,18 +240,24 @@ RevertCaption = false"; // please do not modify.
             string name = "gml_Object_objControlerN_Other_75";
 
             // Make a code entry.
-            UndertaleCode codeEntry = new UndertaleCode();
-            codeEntry.Name = Data.Strings.MakeString(name);
+            UndertaleCode codeEntry = new UndertaleCode
+            {
+                Name = Data.Strings.MakeString(name)
+            };
             Data.Code.Add(codeEntry);
 
             // Make a code locals entry.
-            UndertaleCodeLocals locals = new UndertaleCodeLocals();
-            locals.Name = codeEntry.Name;
+            UndertaleCodeLocals locals = new UndertaleCodeLocals
+            {
+                Name = codeEntry.Name
+            };
 
             // Make a `var arguments;` entry.
-            UndertaleCodeLocals.LocalVar argsLocal = new UndertaleCodeLocals.LocalVar();
-            argsLocal.Name = Data.Strings.MakeString("arguments");
-            argsLocal.Index = 0;
+            UndertaleCodeLocals.LocalVar argsLocal = new UndertaleCodeLocals.LocalVar
+            {
+                Name = Data.Strings.MakeString("arguments"),
+                Index = 0
+            };
 
             // Glue everything together.
             locals.Locals.Add(argsLocal);
@@ -257,12 +276,16 @@ RevertCaption = false"; // please do not modify.
             int OtherEventInd = 7;
             uint MethodNumber = 75;
 
-            UndertaleGameObject.EventAction action = new UndertaleGameObject.EventAction();
-            action.ActionName = codeEntry.Name;
-            action.CodeId = codeEntry;
+            UndertaleGameObject.EventAction action = new UndertaleGameObject.EventAction
+            {
+                ActionName = codeEntry.Name,
+                CodeId = codeEntry
+            };
 
-            UndertaleGameObject.Event evnt = new UndertaleGameObject.Event();
-            evnt.EventSubtype = MethodNumber;
+            UndertaleGameObject.Event evnt = new UndertaleGameObject.Event
+            {
+                EventSubtype = MethodNumber
+            };
             evnt.Actions.Add(action);
 
             var eventList = obj.Events[OtherEventInd];
@@ -275,18 +298,24 @@ RevertCaption = false"; // please do not modify.
             string gmlWeirdName = "gml_Script_" + Path.GetFileNameWithoutExtension(path);
 
             // Make a code entry.
-            UndertaleCode codeEntry = new UndertaleCode();
-            codeEntry.Name = Data.Strings.MakeString(gmlWeirdName);
+            UndertaleCode codeEntry = new UndertaleCode
+            {
+                Name = Data.Strings.MakeString(gmlWeirdName)
+            };
             Data.Code.Add(codeEntry);
 
             // Make a code locals entry.
-            UndertaleCodeLocals locals = new UndertaleCodeLocals();
-            locals.Name = codeEntry.Name;
+            UndertaleCodeLocals locals = new UndertaleCodeLocals
+            {
+                Name = codeEntry.Name
+            };
 
             // Make a `var arguments;` entry.
-            UndertaleCodeLocals.LocalVar argsLocal = new UndertaleCodeLocals.LocalVar();
-            argsLocal.Name = Data.Strings.MakeString("arguments");
-            argsLocal.Index = 0;
+            UndertaleCodeLocals.LocalVar argsLocal = new UndertaleCodeLocals.LocalVar
+            {
+                Name = Data.Strings.MakeString("arguments"),
+                Index = 0
+            };
 
             // Glue everything together.
             locals.Locals.Add(argsLocal);
@@ -300,14 +329,18 @@ RevertCaption = false"; // please do not modify.
             Data.Code.ByName(gmlWeirdName).ReplaceGML(scriptSource, Data);
 
             // ... and actually add it like a script...
-            var scr = new UndertaleScript();
-            scr.Code = Data.Code.ByName(gmlWeirdName);
-            scr.Name = Data.Strings.MakeString(Path.GetFileNameWithoutExtension(path));
+            var scr = new UndertaleScript
+            {
+                Code = Data.Code.ByName(gmlWeirdName),
+                Name = Data.Strings.MakeString(Path.GetFileNameWithoutExtension(path))
+            };
             Data.Scripts.Add(scr);
 
             // ... oh, and don't forget to add a *function* reference.
-            var funcentry = new UndertaleFunction();
-            funcentry.Name = Data.Strings.MakeString(Path.GetFileNameWithoutExtension(path));
+            var funcentry = new UndertaleFunction
+            {
+                Name = Data.Strings.MakeString(Path.GetFileNameWithoutExtension(path))
+            };
             Data.Functions.Add(funcentry);
         }
 
